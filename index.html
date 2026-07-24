@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>DAD's Organic Market</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Manufacturing+Consent&family=Permanent+Marker&display=swap" rel="stylesheet">
+
+
+  <style>
+    :root {
+      --mono: 'IBM Plex Mono', monospace;
+      --marker: 'Permanent Marker', cursive;
+      --bodyBackground: #faf6f0;
+      --shelfBackground: #7daeaa;
+      --mainTextWhite: #FFFFFF;
+      --momsRed: #dd3d3b;
+      --black: #000000;
+      --yellow: #F0C33C;
+      --green: #a1e397;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bodyBackground);
+      color: var(--mainTextWhite);
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+    }
+    .brand h1 {
+    font-family: var(--marker);
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--momsRed);
+    line-height: 1;
+    transform: rotate(-1deg);
+    }
+    .brand h2 {
+      font-size: 16px;
+      font-family: var(--mono);
+      color: var(--momsRed);
+    }
+
+    .status-line {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--black);
+      text-align: right;
+    }
+
+    .status-line .live {
+      color: var(--yellow);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 22px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+
+
+
+    .shelf {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 14px;
+    }
+
+    .loading-row {
+      grid-column: 1 / -1;
+      font-family: var(--mono);
+      color: var(--mainTextWhite);
+      padding: 40px 0;
+      text-align: center;
+    }
+
+    .card {
+      background: var(--shelfBackground);
+      border: 1px solid var(--mainTextWhite);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .card img {
+      width: 100%;
+      height: 110px;
+      object-fit: contain;
+      padding: 6px;
+    }
+
+    .card-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      line-height: 1.3;
+      min-height: 34px;
+    }
+
+    .card-meta {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--mainTextWhite);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .card-price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2px;
+    }
+
+    .card-price {
+      font-family: var(--mono);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--mainTextWhite);
+    }
+
+    .add-btn {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--yellow);
+      color: var(--black);
+      border: none;
+      padding: 7px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: filter 0.15s ease;
+    }
+
+    .add-btn:hover { filter: brightness(1.1); }
+    .add-btn:disabled { opacity: 0.5; cursor: default; }
+
+
+
+
+
+    .cart-panel {
+      background: var(--shelfBackground);
+      border-radius: 8px;
+      position: sticky;
+      top: 20px;
+    }
+
+    .panel-header {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--mainTextWhite);
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--mainTextWhite);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .cart-items {
+      max-height: 240px;
+      overflow-y: auto;
+      padding: 8px 16px;
+    }
+
+    .cart-empty {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--mainTextWhite);
+      text-align: center;
+      padding: 30px 0;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      font-size: 13px;
+    }
+
+    .cart-item:last-child { border-bottom: none; }
+
+    .cart-item-name { flex: 1; padding-right: 8px; }
+    .cart-item-qty { font-family: var(--mono); color: var(--mainTextWhite); font-size: 12px; }
+    .cart-item-remove { background: none; border: none; color: var(--momsRed); cursor: pointer; font-family: var(--mono); font-size: 18px; margin-left: 8px;}
+
+    .checkout-btn {
+      width: calc(100% - 32px);
+      margin: 14px 16px 16px;
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      background: var(--yellow);
+      color: var(--black);
+      border: none;
+      padding: 13px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .checkout-btn:disabled { opacity: 0.5; cursor: default; }
+
+    .receipt {
+      margin: 0 16px 16px;
+      background: var(--mainTextWhite);
+      color: var(--black);
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 16px 14px;
+      border-radius: 2px;
+      position: relative;
+      line-height: 1.6;
+    }
+
+    .receipt-title {
+      text-align: center;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    .receipt-line {
+      display: flex;
+      justify-content: space-between;
+      padding: 3px 0;
+    }
+
+    .receipt-total {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      padding-top: 8px;
+      margin-top: 6px;
+      border-top: 1px solid var(--black);
+    }
+
+    .receipt-discount { color: var(--momsRed); }
+    .receipt-slot {padding-bottom: 5px;}
+
+
+
+
+
+    /* API section */
+    .console-panel {
+      background: var(--black);
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    .console-body {
+      max-height: 360px;
+      overflow-y: auto;
+    }
+
+    .log-entry {
+      padding: 12px 16px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+    }
+
+    .log-entry:last-child { border-bottom: none; }
+
+    .log-top {
+      display: flex;
+      justify-content: space-between;
+      color: var(--mainTextWhite);
+      margin-bottom: 5px;
+    }
+
+
+
+
+
+    .log-method.get { color: var(--green); }
+    .log-method.post { color: var(--yellow); }
+    .log-status { font-weight: 700; }
+    .log-status.ok { color: var(--green); }
+    .log-status.err { color: var(--momsRed); }
+
+    .log-url {
+      color: var(--mainTextWhite);
+      word-break: break-all;
+      margin-bottom: 6px;
+    }
+
+    .log-toggle {
+      color: var(--yellow);
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .log-json {
+      margin-top: 6px;
+      background: var(--mainTextWhite);
+      color: var(--black);
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-size: 10.5px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-all;
+      display: none;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .log-json.open { display: block; }
+
+    footer {
+      margin-top: 28px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--black);
+      text-align: center;
+    }
+  </style>
+
+
+
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <h1>DAD's Organic Market</h1>
+        <h2>Demo by Dominick Hernandez</h2>
+      </div>
+      <div class="status-line">
+        <span class="live">&#x25CF;</span> <span class="req-count">0</span> live requests this session
+      </div>
+    </header>
+
+    <div class="layout">
+      <div>
+        <div class="shelf">
+          <div class="loading-row">loading shelf...</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="cart-panel">
+          <div class="panel-header">
+            <span>Your Cart</span>
+            <span class="cart-count">0 items</span>
+          </div>
+          <div class="cart-items">
+            <div class="cart-empty">Your basket is empty.<br>Add something from the shelf.</div>
+          </div>
+          <button class="checkout-btn" disabled>CHECK OUT</button>
+          <div class="receipt-slot"></div>
+        </div>
+
+        <div class="console-panel">
+          <div class="panel-header">
+            <span>API Console</span>
+            <span class="console-hint">waiting…</span>
+          </div>
+          <div class="console-body" class="console-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      &copy; 2026 Dominick Hernandez
+    </footer>
+  </div>
+
+<script>
+  let products = [];
+  let cart = {};
+  let reqCount = 0;
+
+
+  const shelfElement = document.querySelector('.shelf');
+  const cartItemsElement = document.querySelector('.cart-items');
+  const cartCountElement = document.querySelector('.cart-count');
+  const checkoutBtn = document.querySelector('.checkout-btn');
+  const receiptSlot = document.querySelector('.receipt-slot');
+  const consoleBody = document.querySelector('.console-body');
+  const reqCounter = document.querySelector('.req-count');
+  const consoleHint = document.querySelector('.console-hint');
+
+
+
+
+  function syntaxHighlight(obj) {
+    const json = JSON.stringify(obj, null, 2);
+    return json
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"([^"]+)":/g, '<span class="k">"$1"</span>:')
+      .replace(/: "([^"]*)"/g, ': <span class="v">"$1"</span>')
+      .replace(/: (-?\d+\.?\d*)/g, ': <span class="v">$1</span>');
+  }
+
+
+
+
+
+  function logRequest(method, url, status, ok, body) {
+    reqCount++;
+    reqCounter.textContent = reqCount;
+    consoleHint.textContent = ok ? 'last call succeeded' : 'last call failed';
+
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    const id = 'log-' + reqCount;
+    entry.innerHTML = `
+      <div class="log-top">
+        <span><span class="log-method ${method.toLowerCase()}">${method}</span> - request #${reqCount}</span>
+        <span class="log-status ${ok ? 'ok' : 'err'}">${status}</span>
+      </div>
+      <div class="log-url">${url}</div>
+      <div class="log-toggle" data-target="${id}">▸ view response body</div>
+      <div class="log-json" id="${id}">${syntaxHighlight(body)}</div>
+    `;
+
+
+
+    consoleBody.prepend(entry);
+    entry.querySelector('.log-toggle').addEventListener('click', (e) => {
+      const t = document.getElementById(id);
+      t.classList.toggle('open');
+      e.target.textContent = t.classList.contains('open') ? '▾ hide response body' : '▸ view response body';
+    });
+  }
+
+  async function callApi(url, options = {}) {
+    const method = options.method || 'GET';
+    try {
+      const res = await fetch(url, options);
+      const data = await res.json();
+      logRequest(method, url, res.status, res.ok, data);
+      if (!res.ok) throw new Error('Request failed: ' + res.status);
+      return data;
+    } catch (err) {
+      logRequest(method, url, 'ERR', false, { error: err.message });
+      throw err;
+    }
+  }
+
+  function renderShelf() {
+    if (products.length === 0) {
+      shelfElement.innerHTML = '<div class="loading-row">No products found.</div>';
+      return;
+    }
+
+
+
+    shelfElement.innerHTML = '';
+
+    //console.log(products);
+    let productLimit = 9;
+    let selectProducts = products.slice(0,productLimit);
+
+
+    selectProducts.forEach(product => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <img src="${product.thumbnail}" alt="${product.title}" loading="lazy">
+        <div class="card-title">${product.title}</div>
+        <div class="card-meta">
+          <span>${product.stock > 0 ? product.stock + ' in stock' : 'out of stock'}</span>
+          <span>&#x2605; ${product.rating}</span>
+        </div>
+        <div class="card-price-row">
+          <span class="card-price">$${product.price.toFixed(2)}</span>
+          <button class="add-btn" data-id="${product.id}" ${product.stock === 0 ? 'disabled' : ''}>ADD</button>
+        </div>
+      `;
+      shelfElement.appendChild(card);
+    });
+
+    shelfElement.querySelectorAll('.add-btn').forEach(btn => {
+      btn.addEventListener('click', () => addToCart(parseInt(btn.dataset.id)));
+    });
+  }
+
+  function addToCart(id) {
+    const product = products.find(product => product.id === id);
+    if (!product) return;
+    if (cart[id]) {
+      cart[id].quantity += 1;
+    } else {
+      cart[id] = { product, quantity: 1 };
+    }
+    renderCart();
+  }
+
+  function removeFromCart(id) {
+    delete cart[id];
+    renderCart();
+  }
+
+  function renderCart() {
+    const items = Object.values(cart);
+    const totalQty = items.reduce((sum, i) => sum + i.quantity, 0);
+    cartCountElement.textContent = totalQty + (totalQty === 1 ? ' item' : ' items');
+
+    if (items.length === 0) {
+      cartItemsElement.innerHTML = '<div class="cart-empty">Your basket is empty.<br>Add something from the shelf.</div>';
+      checkoutBtn.disabled = true;
+      receiptSlot.innerHTML = '';
+      return;
+    }
+
+    cartItemsElement.innerHTML = '';
+    items.forEach(({ product, quantity }) => {
+      const row = document.createElement('div');
+      row.className = 'cart-item';
+      row.innerHTML = `
+        <span class="cart-item-name">${product.title}</span>
+        <span class="cart-item-qty">x${quantity}</span>
+        <button class="cart-item-remove" data-id="${product.id}"><strong>x</strong></button>
+      `;
+      cartItemsElement.appendChild(row);
+    });
+
+    cartItemsElement.querySelectorAll('.cart-item-remove').forEach(btn => {
+      btn.addEventListener('click', () => removeFromCart(parseInt(btn.dataset.id)));
+    });
+
+    checkoutBtn.disabled = false;
+  }
+
+  function renderReceipt(cartResponse) {
+    const lines = cartResponse.products.map(product => `
+      <div class="receipt-line">
+        <span>${product.title.slice(0, 22)} x${product.quantity}</span>
+        <span>$${product.total.toFixed(2)}</span>
+      </div>
+    `).join('');
+
+    receiptSlot.innerHTML = `
+      <div class="receipt">
+        <div class="receipt-title">RECEIPT</div>
+        ${lines}
+        <div class="receipt-line">
+          <span>Subtotal</span>
+          <span>$${cartResponse.total.toFixed(2)}</span>
+        </div>
+        <div class="receipt-line receipt-discount">
+          <span>Discount</span>
+          <span>-$${(cartResponse.total - cartResponse.discountedTotal).toFixed(2)}</span>
+        </div>
+        <div class="receipt-total">
+          <span>Total</span>
+          <span>$${cartResponse.discountedTotal.toFixed(2)}</span>
+        </div>
+      </div>
+    `;
+  }
+
+
+
+
+
+
+
+
+
+  async function checkout() {
+    const items = Object.values(cart);
+    if (items.length === 0) return;
+
+    checkoutBtn.disabled = true;
+    checkoutBtn.textContent = 'PROCESSING...';
+
+    try {
+      const payload = {
+        userId: 1,
+        products: items.map(({ product, quantity }) => ({ id: product.id, quantity }))
+      };
+      const cartResponse = await callApi('https://dummyjson.com/carts/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      renderReceipt(cartResponse);
+    } catch (err) {
+      receiptSlot.innerHTML = `<div class="cart-empty">Checkout failed.</div>`;
+    } finally {
+      checkoutBtn.disabled = false;
+      checkoutBtn.textContent = 'CHECK OUT';
+    }
+  }
+
+  async function loadShelf() {
+    try {
+      const data = await callApi('https://dummyjson.com/products/category/groceries');
+      products = data.products;
+      renderShelf();
+    } catch (err) {
+      shelfElement.innerHTML = '<div class="loading-row">Could not load products.</div>';
+    }
+  }
+
+  checkoutBtn.addEventListener('click', checkout);
+
+  window.addEventListener('DOMContentLoaded', loadShelf);
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
